@@ -1,0 +1,71 @@
+% arara: pdflatex
+
+\documentclass{beamer}
+\usetheme{Madrid}
+
+\usepackage[]{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\newcommand{\diag}[1]{\text{diag}\,#1}
+
+\title{Amazing Presentation About Fibonacci Sequence}
+\author{Paul Kim}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+    \frametitle{Fibonacci Stuff}
+    \begin{definition}
+        Fibonacci sequence $\left\{ F_n \right\}$ is defined as:
+        \begin{align*}
+            F_1 &= 1 \\
+            F_2 &= 1 \\
+            \forall n \in \mathbb{Z}^{\geq 0}: F_{n+2} &= F_{n} + F_{n+1}
+        \end{align*}
+    \end{definition}
+    \onslide<2->
+    {
+        \textbf{Goal}: Finding the general formula for the Fibonacci sequence!
+    }
+\end{frame}
+
+\begin{frame}
+    \frametitle{Derivation}
+    Here is a slick way to get a general formula for Fibonacci sequence.
+    \onslide<2->
+    {
+        Rewrite the recurrence equation as:
+        \begin{align*}
+            \begin{pmatrix}
+                F_{n+2} \\
+                F_{n+1}
+            \end{pmatrix}
+            &= 
+            \begin{pmatrix}
+                1 & 1 \\
+                1 & 0
+            \end{pmatrix}
+            \begin{pmatrix}
+                F_{n+1} \\
+                F_n
+            \end{pmatrix}
+        \end{align*}
+        (I know, the second equation is redundant, but bare with me\dots)
+    }
+    \onslide<3->
+    Now, by eigendecomposition of the matrix:
+    \begin{equation*}
+        \begin{pmatrix}
+            1 & 1 \\
+            1 & 0
+        \end{pmatrix}
+        =
+        V D V^T
+    \end{equation*}
+    where $D = \diag{\left( \phi, \psi \right)}$.
+\end{frame}
+
+\end{document}
