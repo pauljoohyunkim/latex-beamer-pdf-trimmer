@@ -9,17 +9,17 @@ class TestPageComparison(unittest.TestCase):
         pages = list(reader.pages)
         analyzer = latex_beamer_pdf_trimmer.ConsecutivePageDifference(pages)
         analyzer.setPagePair(0)
-        self.assertFalse(analyzer.isThereCommonHeader())
+        self.assertEqual(analyzer.headerlength, 0)
         analyzer.setPagePair(1)
-        self.assertTrue(analyzer.isThereCommonHeader())
+        self.assertGreater(analyzer.headerlength, 0)
 
-#    def test_common_footer(self):
-#        reader = PyPDF2.PdfReader("tests/pres1.pdf")
-#        pages = list(reader.pages)
-#        consecutive_analysis1 = latex_beamer_pdf_trimmer.ConsecutivePageDifference(pages[0], pages[1])
-#        self.assertFalse(consecutive_analysis1.isThereCommonFooter())
-#        consecutive_analysis2 = latex_beamer_pdf_trimmer.ConsecutivePageDifference(pages[1], pages[2])
-#        self.assertTrue(consecutive_analysis2.isThereCommonFooter())
+    def test_common_footer(self):
+        reader = PyPDF2.PdfReader("tests/pres1.pdf")
+        pages = list(reader.pages)
+        analyzer = latex_beamer_pdf_trimmer.ConsecutivePageDifference(pages)
+        analyzer.setPagePair(0)
+        self.assertEqual(analyzer.footerlength, 4)
+        
         
 
 if __name__ == "__main__":

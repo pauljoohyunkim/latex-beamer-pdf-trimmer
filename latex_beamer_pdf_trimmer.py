@@ -11,6 +11,8 @@ class ConsecutivePageDifference:
         self.str1 = None
         self.str2 = None
         self.stringmatches = None
+        self.headerlength = 0
+        self.footerlength = 0
     
     def setPagePair(self, pagenum):
         self.page1 = self.pages[pagenum]
@@ -18,23 +20,27 @@ class ConsecutivePageDifference:
         self.str1 = self.page1.extract_text()
         self.str2 = self.page2.extract_text()
         self.stringmatches = difflib.SequenceMatcher(None, self.str1, self.str2).get_matching_blocks()
+        self.getCommonHeaderLength()
+        self.getCommonFooterLength()
         
-    def isThereCommonHeader(self) -> bool:
+    def getCommonHeaderLength(self) -> None:
         if self.stringmatches:
             if self.stringmatches[0].a == 0 and self.stringmatches[0].b == 0:
-                return True
-        return False
+                self.headerlength = self.stringmatches[0].size
+                return
+        self.headerlength = 0
     
-#    def isThereCommonFooter(self) -> bool:
-#        # Reverse the string and find footer
-#        reversed_str1 = self.str1[::-1]
-#        reversed_str2 = self.str2[::-1]
-#        headerdetector = difflib.SequenceMatcher(None, reversed_str1, reversed_str2).get_matching_blocks()
-#        if headerdetector:
-#            if headerdetector[0].a == 0 and headerdetector[0].b == 0:
-#                return True
-#        return False
-#
+    def getCommonFooterLength(self) -> None:
+        # Reverse the string and find footer
+        reversed_str1 = self.str1[::-1]
+        reversed_str2 = self.str2[::-1]
+        headerdetector = difflib.SequenceMatcher(None, reversed_str1, reversed_str2).get_matching_blocks()
+        if headerdetector:
+            if headerdetector[0].a == 0 and headerdetector[0].b == 0:
+                self.footerlength = headerdetector[0].size
+                return
+        self.footerlength = 0
+
 
 if __name__ == "__main__":
     argc = len(sys.argv)
