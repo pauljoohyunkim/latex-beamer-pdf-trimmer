@@ -19,6 +19,8 @@ class TestPageComparison(unittest.TestCase):
         analyzer = latex_beamer_pdf_trimmer.ConsecutivePageDifference(pages)
         analyzer.setPagePair(0)
         self.assertEqual(analyzer.footerlength, 4)
+        analyzer.setPagePair(1)
+        self.assertGreater(analyzer.footerlength, 4)
         
         
 
