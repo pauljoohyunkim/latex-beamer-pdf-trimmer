@@ -4,7 +4,7 @@ import difflib
 import PyPDF2
 
 class ConsecutivePageDifference:
-    def __init__(self, pages: PyPDF2.PdfReader):
+    def __init__(self, pages: PyPDF2.PdfReader.pages):
         self.pages = pages
         self.page1 = None
         self.page2 = None
@@ -74,10 +74,13 @@ if __name__ == "__main__":
         print(f"Output file: {outputfilename}")
     
     # Read pdf file
-    # There might be common substrings in each page, which might needs detection.
-    # A potential method is to find the longest common substrings, then see if they needs disregardment.
     reader = PyPDF2.PdfReader(inputfilename)
-    page = reader.pages[0]
-    print(page.extract_text())
+    consecutiveAnalyzer = ConsecutivePageDifference(reader.pages)
 
+    discardPageNums = []
+    for pagenum in range(len(reader.pages) - 1):
+        consecutiveAnalyzer.setPagePair(pagenum)
+        if consecutiveAnalyzer.isContentAdded():
+            discardPageNums.append(pagenum)
     
+    print(f"Pages to discard: {discardPageNums}")
