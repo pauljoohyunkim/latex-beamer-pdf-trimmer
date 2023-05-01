@@ -4,11 +4,19 @@ import difflib
 import PyPDF2
 
 class ConsecutivePageDifference:
-    def __init__(self, page1: PyPDF2.PageObject, page2: PyPDF2.PageObject):
-        self.page1 = page1
-        self.page2 = page2
-        self.str1 = page1.extract_text()
-        self.str2 = page2.extract_text()
+    def __init__(self, pages: PyPDF2.PdfReader):
+        self.pages = pages
+        self.page1 = None
+        self.page2 = None
+        self.str1 = None
+        self.str2 = None
+        self.stringmatches = None
+    
+    def setPagePair(self, pagenum):
+        self.page1 = self.pages[pagenum]
+        self.page2 = self.pages[pagenum+1]
+        self.str1 = self.page1.extract_text()
+        self.str2 = self.page2.extract_text()
         self.stringmatches = difflib.SequenceMatcher(None, self.str1, self.str2).get_matching_blocks()
         
     def isThereCommonHeader(self) -> bool:
@@ -16,7 +24,17 @@ class ConsecutivePageDifference:
             if self.stringmatches[0].a == 0 and self.stringmatches[0].b == 0:
                 return True
         return False
-
+    
+#    def isThereCommonFooter(self) -> bool:
+#        # Reverse the string and find footer
+#        reversed_str1 = self.str1[::-1]
+#        reversed_str2 = self.str2[::-1]
+#        headerdetector = difflib.SequenceMatcher(None, reversed_str1, reversed_str2).get_matching_blocks()
+#        if headerdetector:
+#            if headerdetector[0].a == 0 and headerdetector[0].b == 0:
+#                return True
+#        return False
+#
 
 if __name__ == "__main__":
     argc = len(sys.argv)
