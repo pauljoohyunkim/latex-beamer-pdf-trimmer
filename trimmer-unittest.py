@@ -21,6 +21,24 @@ class TestPageComparison(unittest.TestCase):
         self.assertEqual(analyzer.footerlength, 4)
         analyzer.setPagePair(1)
         self.assertGreater(analyzer.footerlength, 4)
+    
+    def test_added_content(self):
+        reader = PyPDF2.PdfReader("tests/pres1.pdf")
+        pages = list(reader.pages)
+        analyzer = latex_beamer_pdf_trimmer.ConsecutivePageDifference(pages)
+        analyzer.setPagePair(0)
+        self.assertFalse(analyzer.isContentAdded())
+        analyzer.setPagePair(1)
+        self.assertTrue(analyzer.isContentAdded())
+        analyzer.setPagePair(2)
+        self.assertFalse(analyzer.isContentAdded())
+        analyzer.setPagePair(3)
+        self.assertTrue(analyzer.isContentAdded())
+        analyzer.setPagePair(4)
+        self.assertTrue(analyzer.isContentAdded())
+        analyzer.setPagePair(5)
+        self.assertFalse(analyzer.isContentAdded())
+
         
         
 

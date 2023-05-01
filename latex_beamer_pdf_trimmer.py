@@ -40,6 +40,14 @@ class ConsecutivePageDifference:
                 self.footerlength = headerdetector[0].size
                 return
         self.footerlength = 0
+    
+    def isContentAdded(self) -> bool:
+        '''
+        Returns whether the next slide is acquired from adding some more text.
+        '''
+        page1_text_without_header_and_footer = self.str1[self.headerlength: -self.footerlength + len(self.str1)].strip()
+        page2_text_without_header_and_footer = self.str2[self.headerlength: -self.footerlength + len(self.str2)].strip()
+        return page1_text_without_header_and_footer in page2_text_without_header_and_footer
 
 
 if __name__ == "__main__":
