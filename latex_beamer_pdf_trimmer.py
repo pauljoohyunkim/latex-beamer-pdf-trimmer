@@ -77,10 +77,17 @@ if __name__ == "__main__":
     reader = PyPDF2.PdfReader(inputfilename)
     consecutiveAnalyzer = ConsecutivePageDifference(reader.pages)
 
-    discardPageNums = []
+    discardPageNums = set()
     for pagenum in range(len(reader.pages) - 1):
         consecutiveAnalyzer.setPagePair(pagenum)
         if consecutiveAnalyzer.isContentAdded():
-            discardPageNums.append(pagenum)
+            discardPageNums.add(pagenum)
     
     print(f"Pages to discard: {discardPageNums}")
+
+    # Write pdf file
+    writer = PyPDF2.PdfWriter()
+    for i in range(len(reader.pages)):
+        if i not in discardPageNums:
+            writer.add_page(reader.pages[i])
+    writer.write(outputfilename)
