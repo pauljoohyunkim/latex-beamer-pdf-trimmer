@@ -19,11 +19,16 @@ if __name__ == "__main__":
         sys.exit(1)
     
     # If one argument
-    if argc >= 2:
+    if argc == 2:
         inputfilename = sys.argv[1]
+        ifilename, ifilename_ext = os.path.splitext(inputfilename)
+        outputfilename = f"{ifilename}_trimmed{ifilename_ext}"
         print(f"Input file: {inputfilename}")
-    if argc >= 3:
+        print(f"Output file: {outputfilename}")
+    if argc == 3:
+        inputfilename = sys.argv[1]
         outputfilename = sys.argv[2]
+        print(f"Input file: {inputfilename}")
         print(f"Output file: {outputfilename}")
 
     
