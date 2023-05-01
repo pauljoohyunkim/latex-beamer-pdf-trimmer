@@ -65,7 +65,53 @@
         =
         V D V^T
     \end{equation*}
-    where $D = \diag{\left( \phi, \psi \right)}$.
+    where $D = \diag{\left( \phi, \psi \right)}$ is the diagonal matrix with entries being the two roots of
+    $\lambda^2 - \lambda - 1 = 0$.
+\end{frame}
+
+\begin{frame}
+    So the recurrence equation can be written as:
+        \begin{align*}
+            \begin{pmatrix}
+                F_{n+2} \\
+                F_{n+1}
+            \end{pmatrix}
+            &= 
+            V D V^T
+            \begin{pmatrix}
+                F_{n+1} \\
+                F_n
+            \end{pmatrix}
+        \end{align*}
+        \onslide<2->
+        {
+            By induction, one deduces:
+            \begin{align*}
+                \begin{pmatrix}
+                    F_{n+1} \\
+                    F_n
+                \end{pmatrix}
+                &=
+                \left( VDV^T \right)^{n}
+                \begin{pmatrix}
+                    F_{1} \\
+                    F_{0}
+                \end{pmatrix}
+                \\
+                &= 
+                V D^n V^T
+                \begin{pmatrix}
+                    F_{1} \\
+                    F_{0}
+                \end{pmatrix}
+            \end{align*}
+            where the last equality comes from $V$ being orthogonal and $D$ being diagonal.
+        }
+        \onslide<3->
+        {
+            It is easy to now acquire the general form of $F_n$.
+            (It is left as an exercise.)
+        }
 \end{frame}
 
 \end{document}
