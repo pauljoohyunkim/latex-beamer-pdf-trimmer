@@ -1,6 +1,7 @@
 import sys
 import os
 import difflib
+import pickle
 import PyPDF2
 
 class ConsecutivePageDifference:
@@ -49,6 +50,44 @@ class ConsecutivePageDifference:
         page2_text_without_header_and_footer = self.str2[self.headerlength: -self.footerlength + len(self.str2)].strip()
         return page1_text_without_header_and_footer in page2_text_without_header_and_footer
 
+class PDFAnalyzer:
+    def __init__(self, readerObj : PyPDF2.PdfReader):
+        self.readerObj = readerObj
+
+    def getDiscardPageNums(self) -> set:
+        reader = self.readerObj
+        consecutiveAnalyzer = ConsecutivePageDifference(reader.pages)
+
+        discardPageNums = set()
+        pdfPageNum = len(reader.pages)
+        for pagenum in range(pdfPageNum - 1):
+            consecutiveAnalyzer.setPagePair(pagenum)
+            if consecutiveAnalyzer.isContentAdded():
+                discardPageNums.add(pagenum)
+            print(f"Progress (Analyzer): {pagenum} / {pdfPageNum}", end="\r")
+        
+        print(f"Pages to discard: {discardPageNums}")
+        return discardPageNums
+
+class PDFRecompiler:
+    def __init__(self, outputfilename : str, reader : PyPDF2.PdfReader):
+        self.writer = PyPDF2.PdfWriter()
+        self.reader = reader
+        self.outputfilename = outputfilename
+    
+    def compile(self, discardPageNums : set):
+        num_of_pages = len(self.reader.pages)
+        for i in range(num_of_pages):
+            if i not in discardPageNums:
+                try:
+                    self.writer.add_page(self.reader.pages[i])
+                    print(f"Progress (Recompiler): {i} / {num_of_pages}", end="\r")
+                except AttributeError:
+                    sys.stderr.write(f"There seems to be a problem of missing attributes. Try repairing the pdf.\n")
+                    sys.exit(2)
+        self.writer.write(self.outputfilename)
+        print(f"Done! Check the file at {self.outputfilename}.")
+
 
 if __name__ == "__main__":
     argc = len(sys.argv)
@@ -75,21 +114,21 @@ if __name__ == "__main__":
     
     # Read pdf file
     reader = PyPDF2.PdfReader(inputfilename)
-    consecutiveAnalyzer = ConsecutivePageDifference(reader.pages)
 
-    discardPageNums = set()
-    pdfPageNum = len(reader.pages)
-    for pagenum in range(pdfPageNum - 1):
-        consecutiveAnalyzer.setPagePair(pagenum)
-        if consecutiveAnalyzer.isContentAdded():
-            discardPageNums.add(pagenum)
-        print(f"Progress: {pagenum} / {pdfPageNum}", end="\r")
-    
-    print(f"Pages to discard: {discardPageNums}")
+    # Check if pickle file exists.
+    # If there is, use the pickle file instead of analyzing from the beginning
+    discardPageNumsFilename = f"{os.path.splitext(inputfilename)[0]}_temp.pkl"
+    if os.path.isfile(discardPageNumsFilename):
+        print(f"{discardPageNumsFilename} exists. Skipping analysis and using this instead.")
+        with open(discardPageNumsFilename, "rb") as file:
+            discardPageNums = pickle.load(file)
+    else:
+        analyzer = PDFAnalyzer(reader)
+        discardPageNums = analyzer.getDiscardPageNums()
+        with open(discardPageNumsFilename, "wb") as file:
+            pickle.dump(discardPageNums, file)
+        print(f"{discardPageNumsFilename} created. If there is an error in the compilation process, you could skip analysis by keeping this file.")
 
     # Write pdf file
-    writer = PyPDF2.PdfWriter()
-    for i in range(len(reader.pages)):
-        if i not in discardPageNums:
-            writer.add_page(reader.pages[i])
-    writer.write(outputfilename)
+    recompiler = PDFRecompiler(outputfilename, reader)
+    recompiler.compile(discardPageNums)
