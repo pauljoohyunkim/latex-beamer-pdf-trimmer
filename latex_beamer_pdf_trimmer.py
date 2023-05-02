@@ -63,7 +63,7 @@ class PDFAnalyzer:
             consecutiveAnalyzer.setPagePair(pagenum)
             if consecutiveAnalyzer.isContentAdded():
                 discardPageNums.add(pagenum)
-            print(f"Progress: {pagenum} / {pdfPageNum}", end="\r")
+            print(f"Progress (Analyzer): {pagenum} / {pdfPageNum}", end="\r")
         
         print(f"Pages to discard: {discardPageNums}")
         return discardPageNums
@@ -78,8 +78,14 @@ class PDFRecompiler:
         num_of_pages = len(self.reader.pages)
         for i in range(num_of_pages):
             if i not in discardPageNums:
-                self.writer.add_page(self.reader.pages[i])
+                try:
+                    self.writer.add_page(self.reader.pages[i])
+                    print(f"Progress (Recompiler): {i} / {num_of_pages}", end="\r")
+                except AttributeError:
+                    sys.stderr.write(f"There seems to be a problem of missing attributes. Try repairing the pdf.\n")
+                    sys.exit(2)
         self.writer.write(self.outputfilename)
+        print(f"Done! Check the file at {self.outputfilename}.")
 
 
 if __name__ == "__main__":
@@ -111,8 +117,5 @@ if __name__ == "__main__":
     discardPageNums = analyzer.getDiscardPageNums()
 
     # Write pdf file
-    writer = PyPDF2.PdfWriter()
-    for i in range(len(reader.pages)):
-        if i not in discardPageNums:
-            writer.add_page(reader.pages[i])
-    writer.write(outputfilename)
+    recompiler = PDFRecompiler(outputfilename, reader)
+    recompiler.compile(discardPageNums)
