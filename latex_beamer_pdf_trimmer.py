@@ -68,6 +68,19 @@ class PDFAnalyzer:
         print(f"Pages to discard: {discardPageNums}")
         return discardPageNums
 
+class PDFRecompiler:
+    def __init__(self, outputfilename : str, reader : PyPDF2.PdfReader):
+        self.writer = PyPDF2.PdfWriter()
+        self.reader = reader
+        self.outputfilename = outputfilename
+    
+    def compile(self, discardPageNums : set):
+        num_of_pages = len(self.reader.pages)
+        for i in range(num_of_pages):
+            if i not in discardPageNums:
+                self.writer.add_page(self.reader.pages[i])
+        self.writer.write(self.outputfilename)
+
 
 if __name__ == "__main__":
     argc = len(sys.argv)
