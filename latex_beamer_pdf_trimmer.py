@@ -1,6 +1,7 @@
 import sys
 import os
 import difflib
+import pickle
 import PyPDF2
 
 class ConsecutivePageDifference:
@@ -113,8 +114,20 @@ if __name__ == "__main__":
     
     # Read pdf file
     reader = PyPDF2.PdfReader(inputfilename)
-    analyzer = PDFAnalyzer(reader)
-    discardPageNums = analyzer.getDiscardPageNums()
+
+    # Check if pickle file exists.
+    # If there is, use the pickle file instead of analyzing from the beginning
+    discardPageNumsFilename = f"{os.path.splitext(inputfilename)[0]}_temp.pkl"
+    if os.path.isfile(discardPageNumsFilename):
+        print(f"{discardPageNumsFilename} exists. Skipping analysis and using this instead.")
+        with open(discardPageNumsFilename, "rb") as file:
+            discardPageNums = pickle.load(file)
+    else:
+        analyzer = PDFAnalyzer(reader)
+        discardPageNums = analyzer.getDiscardPageNums()
+        with open(discardPageNumsFilename, "wb") as file:
+            pickle.dump(discardPageNums, file)
+        print(f"{discardPageNumsFilename} created. If there is an error in the compilation process, you could skip analysis by keeping this file.")
 
     # Write pdf file
     recompiler = PDFRecompiler(outputfilename, reader)
