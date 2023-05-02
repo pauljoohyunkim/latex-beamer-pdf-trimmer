@@ -78,10 +78,12 @@ if __name__ == "__main__":
     consecutiveAnalyzer = ConsecutivePageDifference(reader.pages)
 
     discardPageNums = set()
-    for pagenum in range(len(reader.pages) - 1):
+    pdfPageNum = len(reader.pages)
+    for pagenum in range(pdfPageNum - 1):
         consecutiveAnalyzer.setPagePair(pagenum)
         if consecutiveAnalyzer.isContentAdded():
             discardPageNums.add(pagenum)
+        print(f"Progress: {pagenum} / {pdfPageNum}", end="\r")
     
     print(f"Pages to discard: {discardPageNums}")
 
