@@ -1,6 +1,26 @@
 # latex-beamer-pdf-trimmer
 A script to cut down on redundant slides from animation
 
+## Dependency
+You need PyPDF2 module before using this program.
+You can install by:
+```
+$ pip install PyPDF2
+```
+Or you can try this program without installing the module into your system by creating a virtual environment.
+```
+# Create virtual environment called "venv"
+python -m venv venv     
+
+# If you are using Linux,
+source venv/bin/activate
+# If you are using Windows,
+venv/Scripts/activate.bat
+
+# Install PyPDF2 dependency on the virtual environment.
+pip install -r requirements.txt
+```
+
 ## Usage:
 ```
 $ python latex_beamer_pdf_trimmer.py (input_file.pdf) [output_file.pdf]
