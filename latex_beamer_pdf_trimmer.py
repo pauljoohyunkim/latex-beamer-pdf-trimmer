@@ -49,6 +49,25 @@ class ConsecutivePageDifference:
         page2_text_without_header_and_footer = self.str2[self.headerlength: -self.footerlength + len(self.str2)].strip()
         return page1_text_without_header_and_footer in page2_text_without_header_and_footer
 
+class PDFAnalyzer:
+    def __init__(self, readerObj : PyPDF2.PdfReader):
+        self.readerObj = readerObj
+
+    def getDiscardPageNums(self) -> set:
+        reader = self.readerObj
+        consecutiveAnalyzer = ConsecutivePageDifference(reader.pages)
+
+        discardPageNums = set()
+        pdfPageNum = len(reader.pages)
+        for pagenum in range(pdfPageNum - 1):
+            consecutiveAnalyzer.setPagePair(pagenum)
+            if consecutiveAnalyzer.isContentAdded():
+                discardPageNums.add(pagenum)
+            print(f"Progress: {pagenum} / {pdfPageNum}", end="\r")
+        
+        print(f"Pages to discard: {discardPageNums}")
+        return discardPageNums
+
 
 if __name__ == "__main__":
     argc = len(sys.argv)
@@ -75,17 +94,8 @@ if __name__ == "__main__":
     
     # Read pdf file
     reader = PyPDF2.PdfReader(inputfilename)
-    consecutiveAnalyzer = ConsecutivePageDifference(reader.pages)
-
-    discardPageNums = set()
-    pdfPageNum = len(reader.pages)
-    for pagenum in range(pdfPageNum - 1):
-        consecutiveAnalyzer.setPagePair(pagenum)
-        if consecutiveAnalyzer.isContentAdded():
-            discardPageNums.add(pagenum)
-        print(f"Progress: {pagenum} / {pdfPageNum}", end="\r")
-    
-    print(f"Pages to discard: {discardPageNums}")
+    analyzer = PDFAnalyzer(reader)
+    discardPageNums = analyzer.getDiscardPageNums()
 
     # Write pdf file
     writer = PyPDF2.PdfWriter()
